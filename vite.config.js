@@ -29,13 +29,17 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
-        // Don't intercept Firestore streaming connections
+        // Keep navigations to Firebase's own paths away from the SPA fallback.
         navigateFallbackDenylist: [/^\/.*\/__\//, /^\/.*\/google\.firestore/],
+        // There is deliberately NO route for firestore.googleapis.com here.
+        // Workbox only calls respondWith() for a matching route, so with none,
+        // Firestore's requests never enter the service worker and the browser
+        // makes them natively. A `NetworkOnly` route is NOT a passthrough — it
+        // still hands the request to the SW, which re-issues it with its own
+        // fetch(). Firestore's Listen/Write channels are long-lived streams the
+        // client aborts routinely, and those aborts surface as "a ServiceWorker
+        // intercepted the request and encountered an unexpected error".
         runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*\/(Listen|Write)\/channel/i,
-            handler: 'NetworkOnly'
-          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
