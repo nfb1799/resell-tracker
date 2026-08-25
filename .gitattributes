@@ -1,0 +1,5 @@
+# Normalise line endings so a Windows checkout doesn't churn the whole diff.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.svg text eol=lf

@@ -1,0 +1,73 @@
+rules_version = '2';
+
+// Personal-use resale tracker.
+// Rule of thumb: a signed-in user can only touch their own /users/<uid>/...
+// document tree. On top of that ownership guarantee we add lightweight
+// type/size validation on the fields the app actually writes.
+//
+// Validation style: every field check is guarded by a presence test
+// (`!('x' in data) || ...`), so absent/optional/legacy fields never cause a
+// legitimate write to be rejected — we only reject wrong types or absurd sizes.
+//
+// Note the split between `create, update` and `delete`: on a delete there is no
+// `request.resource`, so a validation written against it would error and deny
+// the whole operation. Deletes are guarded by ownership alone.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function strOk(val, maxLen) {
+      return val is string && val.size() <= maxLen;
+    }
+
+    match /users/{userId} {
+      // Profile document. `settings` is intentionally free-form (currency,
+      // goals, custom categories grow over time), so we only guard the two
+      // top-level identity strings.
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && (!('displayName' in request.resource.data) || strOk(request.resource.data.displayName, 100))
+        && (!('email' in request.resource.data) || strOk(request.resource.data.email, 320));
+      allow delete: if isOwner(userId);
+
+      match /items/{itemId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && (!('title' in request.resource.data) || strOk(request.resource.data.title, 200))
+          && (!('brand' in request.resource.data) || strOk(request.resource.data.brand, 100))
+          && (!('category' in request.resource.data) || strOk(request.resource.data.category, 100))
+          && (!('notes' in request.resource.data) || strOk(request.resource.data.notes, 2000))
+          && (!('status' in request.resource.data) || strOk(request.resource.data.status, 20))
+          && (!('cost' in request.resource.data) || request.resource.data.cost is number)
+          && (!('listPrice' in request.resource.data) || request.resource.data.listPrice is number)
+          && (!('platforms' in request.resource.data) || request.resource.data.platforms is list)
+          && (!('acquiredDate' in request.resource.data) || strOk(request.resource.data.acquiredDate, 20))
+          && (!('listedDate' in request.resource.data) || strOk(request.resource.data.listedDate, 20))
+          // Inline list thumbnail: a ~96px JPEG data URL. The cap keeps a
+          // full-size image from being smuggled onto the item document, which
+          // every device would then have to download on every sync.
+          && (!('thumb' in request.resource.data) || strOk(request.resource.data.thumb, 40000));
+        allow delete: if isOwner(userId);
+
+        // The viewable photo, read only when an item is opened. Firestore caps
+        // a document at 1 MiB; this cap keeps a good margin under that.
+        match /media/{mediaId} {
+          allow read: if isOwner(userId);
+          allow create, update: if isOwner(userId)
+            && (!('dataUrl' in request.resource.data) || strOk(request.resource.data.dataUrl, 400000));
+          allow delete: if isOwner(userId);
+        }
+      }
+    }
+
+    // Default deny for anything else (including any subcollection not listed
+    // above — add an explicit block here if the app grows new ones).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

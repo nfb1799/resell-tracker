@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Dark: charcoal with a warm brass accent */
+  --bg-primary: #0e0e10;
+  --bg-secondary: #18181b;
+  --bg-tertiary: #1f1f23;
+  --bg-hover: #222226;
+  --bg-accent: #211c12;
+  --border-color: #2a2a2e;
+  --border-subtle: #222226;
+  --border-hover: #3a3a3e;
+  --text-primary: #ededec;
+  --text-muted: #9b968f;
+  --text-dimmed: #5e5a55;
+  --accent-color: #d2a24c;
+  --accent-primary: #d2a24c;
+  --accent-hover: #e0b365;
+  --accent-ink: #17130a;
+  --accent-rgb: 210, 162, 76;
+  --header-bg: #0e0e10;
+
+  --success-color: #7ad79b;
+  --success-rgb: 122, 215, 155;
+  --danger-color: #ef6f6f;
+  --danger-rgb: 239, 111, 111;
+  --danger-bg: #2a1a1a;
+  --danger-border: #3a2222;
+  --info-color: #7fb2e5;
+
+  /* Per-platform tints, muted to sit alongside the brass accent */
+  --depop-color: #cd605a;
+  --ebay-color: #398ad6;
+  --vinted-color: #019f68;
+  --other-color: #ab68ba;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --card-shadow: 0 1px 0 rgba(255, 255, 255, .02) inset, 0 6px 16px rgba(0, 0, 0, .32);
+  --menu-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+  --sheet-shadow: 0 -8px 32px rgba(0, 0, 0, .5);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f5f2ec;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #ece8e0;
+  --bg-hover: #eae5dc;
+  --bg-accent: #f6ecd8;
+  --border-color: #d9d3c8;
+  --border-subtle: #e6e0d4;
+  --border-hover: #c4bdaf;
+  --text-primary: #1d1d1f;
+  --text-muted: #6b665d;
+  --text-dimmed: #9d978a;
+  --accent-color: #8a5f18;
+  --accent-primary: #8a5f18;
+  --accent-hover: #6f4c12;
+  --accent-ink: #ffffff;
+  --accent-rgb: 138, 95, 24;
+  --header-bg: #f5f2ec;
+
+  --success-color: #3f9d6a;
+  --success-rgb: 63, 157, 106;
+  --danger-color: #c0432f;
+  --danger-rgb: 192, 67, 47;
+  --danger-bg: #fbecea;
+  --danger-border: #e9b9b1;
+  --info-color: #2f6ba8;
+
+  --depop-color: #b94642;
+  --ebay-color: #0f74c5;
+  --vinted-color: #00804c;
+  --other-color: #9750a7;
+
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 4px 12px rgba(0, 0, 0, .06);
+  --menu-shadow: 0 8px 24px rgba(0, 0, 0, .16);
+  --sheet-shadow: 0 -8px 32px rgba(0, 0, 0, .16);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  font-family: var(--font-sans);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.mono, code, kbd, pre, samp {
+  font-family: var(--font-mono);
+}
+
+/* ───────── shared primitives ───────── */
+
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: var(--card-shadow);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-dimmed);
+}
+
+.muted { color: var(--text-muted); }
+.dimmed { color: var(--text-dimmed); }
+.pos { color: var(--success-color); }
+.neg { color: var(--danger-color); }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, opacity .15s;
+}
+
+.btn:hover { background: var(--bg-hover); border-color: var(--border-hover); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: var(--accent-ink);
+}
+
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+.btn-danger { color: var(--danger-color); border-color: var(--danger-border); background: var(--danger-bg); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+.btn-ghost:hover { background: var(--bg-hover); }
+.btn-block { width: 100%; }
+.btn-sm { padding: 7px 11px; font-size: 13px; border-radius: 8px; }
+
+/* Form controls */
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-dimmed);
+}
+
+.input, .select, .textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 15px; /* >=16px avoids iOS zoom-on-focus; 15 is the practical floor */
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .16);
+}
+
+.textarea { resize: vertical; min-height: 72px; }
+.input.mono { font-family: var(--font-mono); }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Toasts */
+.toast-container {
+  position: fixed;
+  left: 50%;
+  bottom: calc(78px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: var(--menu-shadow);
+  white-space: nowrap;
+}
+
+.toast-success { border-color: rgba(var(--success-rgb), .5); color: var(--success-color); }
+.toast-error { border-color: var(--danger-border); color: var(--danger-color); }
