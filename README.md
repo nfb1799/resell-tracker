@@ -27,6 +27,18 @@ fees, shipping and what you paid for it.
   backup.
 - Works offline (writes queue and sync when you are back on signal).
 
+## Two layouts
+
+Below 1024px the app is the phone design it started as: a bottom tab bar, a
+floating add button, and each item as a stacked card. At 1024px and up it becomes
+a desktop app — a persistent sidebar, a page header, four stat tiles across, and
+inventory and sales as dense sortable tables instead of cards.
+
+The split is deliberate rather than one layout stretched: `src/desktop.css` holds
+every desktop rule behind one media query, so a phone resolves none of it, and
+`useIsDesktop()` (`src/lib/useMediaQuery.js`) picks the structural pieces — sidebar
+vs tab bar, table vs cards — so only one version is ever in the DOM.
+
 ## Setup
 
 ```bash

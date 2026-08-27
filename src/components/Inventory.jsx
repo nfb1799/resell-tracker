@@ -3,6 +3,8 @@ import { useItems } from '../contexts/ItemsContext'
 import { PLATFORM_IDS, platformLabel } from '../lib/platforms'
 import { formatMoney, num } from '../lib/money'
 import { daysListed } from '../lib/date'
+import { useIsDesktop } from '../lib/useMediaQuery'
+import { ItemTable } from './tables'
 import { ItemRow, EmptyState } from './ui'
 
 const STATUS_FILTERS = [
@@ -30,6 +32,7 @@ const matchesSearch = (item, needle) => {
 
 export default function Inventory({ onOpenItem, onSellItem, onAddItem }) {
   const { items, loading, currency, feeSettings } = useItems()
+  const isDesktop = useIsDesktop()
   const [status, setStatus] = useState('all')
   const [platform, setPlatform] = useState('all')
   const [sort, setSort] = useState('newest')
@@ -128,6 +131,16 @@ export default function Inventory({ onOpenItem, onSellItem, onAddItem }) {
             ? 'Your inventory is empty. Add the first thing you picked up to resell.'
             : 'No items match these filters.'}
         </EmptyState>
+      ) : isDesktop ? (
+        <ItemTable
+          items={visible}
+          currency={currency}
+          feeSettings={feeSettings}
+          sort={sort}
+          onSort={setSort}
+          onOpenItem={onOpenItem}
+          onSell={onSellItem}
+        />
       ) : (
         <div className="item-list">
           {visible.map(item => (

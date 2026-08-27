@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import './App.css'
+import './desktop.css'
 import { isConfigured } from './firebase/config'
 import { useAuth } from './contexts/AuthContext'
 import { ItemsProvider } from './contexts/ItemsProvider'
@@ -14,16 +15,18 @@ import ItemSheet from './components/ItemSheet'
 import SellSheet from './components/SellSheet'
 import DonateSheet from './components/DonateSheet'
 import OfflineIndicator from './components/OfflineIndicator'
+import SideNav from './components/SideNav'
+import { useIsDesktop } from './lib/useMediaQuery'
 
 // Recharts is a big dependency and only the Trends tab needs it.
 const Analytics = lazy(() => import('./components/Analytics'))
 
 const PAGES = {
-  dashboard: { title: 'Overview' },
-  inventory: { title: 'Inventory' },
-  sales: { title: 'Sales' },
-  analytics: { title: 'Trends' },
-  settings: { title: 'Settings' },
+  dashboard: { title: 'Overview', sub: 'Where the money stands right now' },
+  inventory: { title: 'Inventory', sub: 'Everything you hold, listed or sold' },
+  sales: { title: 'Sales', sub: 'Every sale and what it actually returned' },
+  analytics: { title: 'Trends', sub: 'How the numbers move over time' },
+  settings: { title: 'Settings', sub: 'Currency, fee estimates and exports' },
 }
 
 const TABS = [
@@ -61,6 +64,7 @@ const TABS = [
 export function Shell() {
   const { currentUser, userProfile, logout } = useAuth()
   const { settings } = useItems()
+  const isDesktop = useIsDesktop()
   const [page, setPage] = useState('dashboard')
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   // One sheet at a time: { mode: 'new' | 'edit' | 'sell', item }
@@ -103,18 +107,38 @@ export function Shell() {
   const initials = (userProfile?.displayName || currentUser?.email || 'U').trim().charAt(0).toUpperCase()
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <div>
-          <span className="app-brand-sub">RESELL TRACKER</span>
-          <h1 className="app-brand">{PAGES[page].title}</h1>
-        </div>
-        <button className="app-avatar" onClick={() => setProfileMenuOpen(v => !v)} aria-label="Profile menu">
-          {initials}
-        </button>
-      </header>
+    <div className={`app${isDesktop ? ' app--desktop' : ''}`}>
+      {isDesktop ? (
+        <SideNav
+          tabs={TABS}
+          page={page}
+          onNavigate={goTo}
+          onAddItem={addItem}
+          onSettings={() => goTo('settings')}
+          onLogout={handleLogout}
+          displayName={userProfile?.displayName}
+          email={currentUser?.email}
+        />
+      ) : (
+        <header className="app-header">
+          <div>
+            <span className="app-brand-sub">RESELL TRACKER</span>
+            <h1 className="app-brand">{PAGES[page].title}</h1>
+          </div>
+          <button className="app-avatar" onClick={() => setProfileMenuOpen(v => !v)} aria-label="Profile menu">
+            {initials}
+          </button>
+        </header>
+      )}
 
-      {profileMenuOpen && (
+      {isDesktop && (
+        <div className="page-header">
+          <h1>{PAGES[page].title}</h1>
+          <span className="page-header-sub">{PAGES[page].sub}</span>
+        </div>
+      )}
+
+      {!isDesktop && profileMenuOpen && (
         <>
           <div className="app-overlay" onClick={() => setProfileMenuOpen(false)} />
           <div className="profile-menu">
@@ -128,7 +152,7 @@ export function Shell() {
         </>
       )}
 
-      <main className="main-content">
+      <main className={`main-content page-${page}`}>
         {page === 'dashboard' && <Dashboard onOpenItem={openItem} onSellItem={sellItem} onAddItem={addItem} />}
         {page === 'inventory' && <Inventory onOpenItem={openItem} onSellItem={sellItem} onAddItem={addItem} />}
         {page === 'sales' && <Sales onOpenItem={openItem} />}
@@ -157,10 +181,11 @@ export function Shell() {
         />
       ) : null}
 
-      {!sheet && page !== 'settings' && (
+      {!isDesktop && !sheet && page !== 'settings' && (
         <button className="fab" onClick={addItem} aria-label="Add item">+</button>
       )}
 
+      {!isDesktop && (
       <nav className="bottom-tabs">
         {TABS.map(tab => {
           const active = tab.id === page
@@ -179,6 +204,7 @@ export function Shell() {
           )
         })}
       </nav>
+      )}
 
       <OfflineIndicator />
     </div>

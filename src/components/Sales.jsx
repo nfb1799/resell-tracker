@@ -3,10 +3,13 @@ import { useItems } from '../contexts/ItemsContext'
 import { totalProfit, formatMoney, formatSigned } from '../lib/money'
 import { monthKey, monthLabel, getLocalDateString } from '../lib/date'
 import { itemsToCsv, downloadCsv } from '../lib/csv'
+import { useIsDesktop } from '../lib/useMediaQuery'
+import { SalesTable } from './tables'
 import { ItemRow, EmptyState } from './ui'
 
 export default function Sales({ onOpenItem }) {
   const { items, loading, currency, feeSettings } = useItems()
+  const isDesktop = useIsDesktop()
 
   // Sold items bucketed by the month they sold in, newest month first.
   const months = useMemo(() => {
@@ -59,12 +62,21 @@ export default function Sales({ onOpenItem }) {
               <span className="dimmed"> · {formatMoney(month.totals.gross, currency)} in</span>
             </span>
           </div>
-          <div className="item-list">
-            {month.items.map(item => (
-              <ItemRow key={item.id} item={item} currency={currency} feeSettings={feeSettings}
-                onClick={() => onOpenItem(item)} />
-            ))}
-          </div>
+          {isDesktop ? (
+            <SalesTable
+              items={month.items}
+              currency={currency}
+              feeSettings={feeSettings}
+              onOpenItem={onOpenItem}
+            />
+          ) : (
+            <div className="item-list">
+              {month.items.map(item => (
+                <ItemRow key={item.id} item={item} currency={currency} feeSettings={feeSettings}
+                  onClick={() => onOpenItem(item)} />
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </>

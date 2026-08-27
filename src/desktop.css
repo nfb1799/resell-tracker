@@ -1,0 +1,296 @@
+/* Desktop layout.
+ *
+ * Everything here is behind the same min-width as `useMediaQuery`'s
+ * DESKTOP_QUERY, and nearly all of it is scoped under `.app--desktop`, which is
+ * only applied when that query matches. A phone never resolves a single rule in
+ * this file — the mobile design is exactly what it was.
+ *
+ * The parts that cannot be CSS (a sidebar instead of a tab bar, a table instead
+ * of stacked cards) are chosen in JS; this file styles the result. */
+
+@media (min-width: 1024px) {
+
+  /* ───────── shell: a fixed nav column beside a scrolling page ───────── */
+
+  .app--desktop {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+    /* Explicit rows matter: the nav spans both and is 100vh tall, so with
+       auto rows the grid would hand that height to the header row and push
+       the page below the fold. */
+    grid-template-rows: auto minmax(0, 1fr);
+    min-height: 100vh;
+    padding-bottom: 0;
+  }
+
+  /* The nav spans every row; the page stacks in the second column. Without
+     this, auto-placement drops the page header beside the sidebar. */
+  .app--desktop > .side-nav { grid-column: 1; grid-row: 1 / -1; }
+  .app--desktop > .page-header,
+  .app--desktop > .main-content { grid-column: 2; }
+
+  .side-nav {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px 14px 18px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-subtle);
+  }
+
+  .side-nav-brand { padding: 0 10px 14px; }
+
+  .side-nav-add {
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .side-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .side-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    padding: 9px 10px;
+    border: none;
+    border-radius: 9px;
+    background: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+
+  .side-nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .side-nav-item.active { background: var(--bg-accent); color: var(--accent-primary); }
+  .side-nav-item.danger:hover { color: var(--danger-color); }
+
+  .side-nav-foot {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .side-nav-account { padding: 2px 10px 10px; }
+  .side-nav-name { font-size: 13.5px; font-weight: 600; }
+
+  .side-nav-mail {
+    font-size: 11.5px;
+    color: var(--text-dimmed);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ───────── page header, now inside the content column ───────── */
+
+  .page-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 30px 32px 0;
+    width: 100%;
+  }
+
+  .page-header h1 { font-size: 27px; letter-spacing: -0.025em; }
+  .page-header-sub { font-size: 13px; color: var(--text-muted); }
+
+  .app--desktop .main-content {
+    /* `margin: 0 auto` (inherited from the mobile rule) beats a grid item's
+       default stretch and sizes it to its content — which collapsed the Trends
+       page to the intrinsic width of a chart. Claim the column explicitly and
+       let the auto margins only do the centring. */
+    width: 100%;
+    max-width: 1180px;
+    padding: 18px 32px 56px;
+    gap: 20px;
+  }
+
+  /* ───────── dashboard: four tiles across, then two columns ───────── */
+
+  .app--desktop .page-dashboard {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .app--desktop .page-dashboard > .stat-grid,
+  .app--desktop .page-dashboard > .empty-state { grid-column: 1 / -1; }
+
+  .app--desktop .stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .app--desktop .stat-tile.wide { grid-column: span 2; }
+  .app--desktop .stat-value { font-size: 25px; }
+
+  /* ───────── trends: the month chart full width, breakdowns beside it ───────── */
+
+  .app--desktop .page-analytics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .app--desktop .page-analytics > .chart-card { grid-column: 1 / -1; }
+
+  /* ───────── settings: two readable columns rather than one long scroll ───────── */
+
+  .app--desktop .page-settings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .app--desktop .page-settings > p { grid-column: 1 / -1; }
+
+  /* ───────── filters on one line ───────── */
+
+  .app--desktop .filter-bar {
+    display: grid;
+    grid-template-columns: minmax(220px, 300px) 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .app--desktop .filter-bar > .page-head {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 12px;
+  }
+
+  /* ───────── data tables ───────── */
+
+  .table-wrap {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  .data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 9px 14px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-dimmed);
+    white-space: nowrap;
+  }
+
+  .data-table th.num, .data-table td.num { text-align: right; }
+
+  .data-table tbody tr {
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background .12s;
+  }
+
+  .data-table tbody tr:last-child { border-bottom: none; }
+  .data-table tbody tr:hover { background: var(--bg-hover); }
+
+  .data-table tbody tr:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: -2px;
+  }
+
+  .data-table td { padding: 9px 14px; vertical-align: middle; }
+
+  .col-thumb { width: 62px; padding-right: 0 !important; }
+  .col-action { width: 78px; text-align: right; }
+
+  .cell-title { font-weight: 600; font-size: 13.5px; }
+
+  .cell-sub {
+    font-size: 11.5px;
+    color: var(--text-dimmed);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cell-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  /* Sortable headers keep the header's typography, not a button's. */
+  .th-sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .th-sort:hover { color: var(--text-primary); }
+  .th-sort.active { color: var(--accent-primary); }
+  .th-caret { font-size: 8px; }
+
+  /* Dimmed rather than hidden: an invisible-but-clickable button in every row
+     is a way to mark something sold by accident, and a keyboard user tabbing
+     to it would never see where they were. */
+  .data-table .item-row-sell { opacity: .45; margin: 0; transition: opacity .12s; }
+  .data-table tbody tr:hover .item-row-sell,
+  .data-table .item-row-sell:focus-visible { opacity: 1; }
+
+  .month-head { padding: 4px 2px 8px; }
+
+  /* ───────── sheets get room to breathe ───────── */
+
+  .sheet { width: min(640px, 92vw); }
+  .sheet .field-row { gap: 14px; }
+
+  /* ───────── forms ───────── */
+
+  .fee-row { grid-template-columns: 1fr 90px 90px; }
+}
+
+/* Screen-reader-only labels for icon-only table columns. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
