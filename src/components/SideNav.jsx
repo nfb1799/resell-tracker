@@ -2,7 +2,7 @@
 // because there is no room; a desktop has a whole column going spare, so the
 // destinations, the primary action and the account all stay visible at once.
 export default function SideNav({
-  tabs, page, onNavigate, onAddItem, onSettings, onLogout, displayName, email,
+  tabs, page, onNavigate, onAddItem, onBulkImport, onSettings, onLogout, displayName, email,
 }) {
   return (
     <nav className="side-nav" aria-label="Main">
@@ -12,6 +12,10 @@ export default function SideNav({
 
       <button className="btn btn-primary side-nav-add" onClick={onAddItem}>
         <span aria-hidden="true">+</span> New item
+      </button>
+
+      <button className="btn btn-sm side-nav-import" onClick={onBulkImport}>
+        Bulk import
       </button>
 
       <ul className="side-nav-list">

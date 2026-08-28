@@ -5,25 +5,9 @@ import { PLATFORM_IDS, platformLabel } from '../lib/platforms'
 import { formatMoney, projectedNet, num } from '../lib/money'
 import { getLocalDateString } from '../lib/date'
 import { processPhoto } from '../lib/image'
+import { CONDITIONS, blankItem } from '../lib/itemFields'
 import { Sheet, BreakdownRow } from './ui'
 
-const CONDITIONS = ['New with tags', 'New without tags', 'Excellent', 'Good', 'Fair', 'For parts']
-
-const blankItem = () => ({
-  title: '',
-  brand: '',
-  category: '',
-  size: '',
-  condition: 'Excellent',
-  notes: '',
-  cost: '',
-  source: '',
-  acquiredDate: getLocalDateString(),
-  status: 'inventory',
-  platforms: [],
-  listPrice: '',
-  listedDate: '',
-})
 
 export default function ItemSheet({ item, onClose, onSell, onDonate }) {
   const { items, addItem, updateItem, deleteItem, setPhoto, removePhoto, getPhoto, currency, feeSettings } = useItems()

@@ -27,6 +27,39 @@ fees, shipping and what you paid for it.
   backup.
 - Works offline (writes queue and sync when you are back on signal).
 
+## Bulk import
+
+**Bulk import** (beside New item in the sidebar, and in the Inventory header on a
+phone) takes a pasted JSON array or a `.json` file:
+
+```json
+[{ "title": "Nautica Polo", "brand": "Nautica", "size": "XL", "category": "Shirt",
+   "condition": "Good", "cost": 0, "acquiredDate": "2026-08-28", "sourcedFrom": "Dad",
+   "listingPlatform": "Depop", "askingPrice": 20, "listedDate": "2026-08-28",
+   "notes": "", "photo": "https://…/P0.jpg" }]
+```
+
+Only `title` is required — everything else falls back to the same defaults the New
+item form uses, since both read them from `src/lib/itemFields.js`. The written
+field names map onto the stored ones (`sourcedFrom` → `source`, `askingPrice` →
+`listPrice`, `listingPlatform` → the `platforms` array), and this app's own names
+are accepted too, so an export round-trips.
+
+`photo` takes either an `https://` URL or a `data:image/…;base64,` URI. Both are
+turned into a Blob and pushed through the same `processPhoto` an uploaded file
+goes through, so an imported photo is stored identically — a small thumbnail on
+the item and the full JPEG in its own document.
+
+Every row is checked before anything is written: a bad condition, an unknown
+platform, a cost that isn't a number, a malformed date or a missing title fails
+that row with a reason and skips it, while the valid rows still import. Fetching a
+photo from a host that blocks cross-origin reads is a warning, not a failure — the
+item goes in without it. The run ends on a summary ("11 added, 1 skipped"), never a
+silent redirect.
+
+Nothing here writes directly: rows go through the same `addItem`/`setPhoto` the
+form uses, so imported items behave identically, computed figures included.
+
 ## Two layouts
 
 Below 1024px the app is the phone design it started as: a bottom tab bar, a

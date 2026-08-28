@@ -14,6 +14,7 @@ import Settings from './components/Settings'
 import ItemSheet from './components/ItemSheet'
 import SellSheet from './components/SellSheet'
 import DonateSheet from './components/DonateSheet'
+import BulkImportSheet from './components/BulkImportSheet'
 import OfflineIndicator from './components/OfflineIndicator'
 import SideNav from './components/SideNav'
 import { useIsDesktop } from './lib/useMediaQuery'
@@ -103,6 +104,7 @@ export function Shell() {
   const sellItem = (item) => setSheet({ mode: 'sell', item })
   const donateItem = (item) => setSheet({ mode: 'donate', item })
   const addItem = () => setSheet({ mode: 'new', item: null })
+  const bulkImport = () => setSheet({ mode: 'import', item: null })
 
   const initials = (userProfile?.displayName || currentUser?.email || 'U').trim().charAt(0).toUpperCase()
 
@@ -114,6 +116,7 @@ export function Shell() {
           page={page}
           onNavigate={goTo}
           onAddItem={addItem}
+          onBulkImport={bulkImport}
           onSettings={() => goTo('settings')}
           onLogout={handleLogout}
           displayName={userProfile?.displayName}
@@ -154,7 +157,9 @@ export function Shell() {
 
       <main className={`main-content page-${page}`}>
         {page === 'dashboard' && <Dashboard onOpenItem={openItem} onSellItem={sellItem} onAddItem={addItem} />}
-        {page === 'inventory' && <Inventory onOpenItem={openItem} onSellItem={sellItem} onAddItem={addItem} />}
+        {page === 'inventory' && (
+          <Inventory onOpenItem={openItem} onSellItem={sellItem} onAddItem={addItem} onBulkImport={bulkImport} />
+        )}
         {page === 'sales' && <Sales onOpenItem={openItem} />}
         {page === 'analytics' && (
           <Suspense fallback={<p className="muted">Loading charts…</p>}>
@@ -164,7 +169,9 @@ export function Shell() {
         {page === 'settings' && <Settings />}
       </main>
 
-      {sheet?.mode === 'sell' ? (
+      {sheet?.mode === 'import' ? (
+        <BulkImportSheet onClose={() => setSheet(null)} />
+      ) : sheet?.mode === 'sell' ? (
         <SellSheet
           item={sheet.item}
           onClose={() => setSheet(null)}

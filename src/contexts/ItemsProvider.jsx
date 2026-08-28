@@ -40,9 +40,11 @@ export function ItemsProvider({ children }) {
   const feeSettings = useMemo(() => withFeeDefaults(settings.fees), [settings.fees])
   const currency = settings.currency || 'USD'
 
-  const addItem = useCallback(async (item) => {
+  // `notify: false` is for bulk import, which reports one summary at the end
+  // rather than a toast per row. The write itself is the same either way.
+  const addItem = useCallback(async (item, { notify = true } = {}) => {
     const id = await service.addItem(userId, item)
-    showToast('Item added', 'success')
+    if (notify) showToast('Item added', 'success')
     return id
   }, [userId, showToast])
 

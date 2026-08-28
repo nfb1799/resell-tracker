@@ -55,3 +55,24 @@ export async function processPhoto(file) {
     bitmap.close()
   }
 }
+
+// Bulk import gives a photo as a URL or an inline data URI rather than a picked
+// file. Both are turned into a Blob and pushed through processPhoto above, so an
+// imported photo is stored byte-for-byte the way an uploaded one is.
+//
+// Fetching someone else's image is a cross-origin request the other host has to
+// allow. Plenty do not, and that is not a reason to lose the item — the caller
+// reports it and imports the row without a photo.
+export async function photoFromSource(src) {
+  const response = await fetch(src, { mode: 'cors' })
+  if (!response.ok) throw new Error(`the image host answered ${response.status}`)
+
+  const blob = await response.blob()
+  // Some hosts serve images with no Content-Type; processPhoto checks the type,
+  // and createImageBitmap sniffs the real format anyway.
+  const typed = blob.type.startsWith('image/')
+    ? blob
+    : new Blob([blob], { type: 'image/jpeg' })
+
+  return processPhoto(typed)
+}

@@ -30,7 +30,7 @@ const matchesSearch = (item, needle) => {
   return haystack.includes(needle)
 }
 
-export default function Inventory({ onOpenItem, onSellItem, onAddItem }) {
+export default function Inventory({ onOpenItem, onSellItem, onAddItem, onBulkImport }) {
   const { items, loading, currency, feeSettings } = useItems()
   const isDesktop = useIsDesktop()
   const [status, setStatus] = useState('all')
@@ -110,11 +110,14 @@ export default function Inventory({ onOpenItem, onSellItem, onAddItem }) {
           <span className="section-label">
             {visible.length} item{visible.length === 1 ? '' : 's'} · {formatMoney(shownCost, currency)} cost
           </span>
-          <select className="select" style={{ width: 'auto' }} value={sort} onChange={(e) => setSort(e.target.value)}>
-            {Object.entries(SORTS).map(([id, s]) => (
-              <option key={id} value={id}>{s.label}</option>
-            ))}
-          </select>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button className="btn btn-sm" onClick={onBulkImport}>Bulk import</button>
+            <select className="select" style={{ width: 'auto' }} value={sort} onChange={(e) => setSort(e.target.value)}>
+              {Object.entries(SORTS).map(([id, s]) => (
+                <option key={id} value={id}>{s.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
